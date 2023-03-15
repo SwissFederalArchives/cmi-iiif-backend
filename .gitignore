@@ -1,0 +1,10 @@
+/data
+/.idea
+/node_modules
+/config
+.env
+docker-compose.yaml
+*.iml
+*.log
+*.js
+*.map
