@@ -3,6 +3,8 @@
 /node_modules
 /config
 .env
+.env.*
+!.env.example
 docker-compose.yaml
 *.iml
 *.log
