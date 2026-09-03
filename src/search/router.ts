@@ -1,5 +1,6 @@
 import { Context } from "koa";
-import * as Router from "koa-router";
+import KoaRouter = require("@koa/router");
+const Router = KoaRouter.default ?? (KoaRouter as any);
 import HttpError from "../lib/HttpError";
 import logger from "../lib/Logger";
 import config from "../lib/Config";
@@ -56,9 +57,9 @@ const RESPONSE_TEMPLATE_COLLECTION = {
 };
 
 // Route handlers
-router.get("/manifest/:id", async (ctx) => handleManifestSearch(ctx));
-router.get("/collection/:id", async (ctx) => handleCollectionSearch(ctx));
-router.get("/collection/:id/raw", async (ctx) =>
+router.get("/manifest/:id", async (ctx: Context) => handleManifestSearch(ctx));
+router.get("/collection/:id", async (ctx: Context) => handleCollectionSearch(ctx));
+router.get("/collection/:id/raw", async (ctx: Context) =>
   handleCollectionSearch(ctx, true)
 );
 

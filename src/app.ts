@@ -1,4 +1,4 @@
-import * as Koa from 'koa';
+import Koa = require('koa');
 import config from './lib/Config';
 import logger from './lib/Logger';
 import {servicesRunning} from './lib/Service';
@@ -13,13 +13,12 @@ servicesRunning.forEach(function initService(service) {
 
 async function startWeb() {
     await setUpWebEnvironment(async app => {
-        const json = await import('koa-json');
-        const bodyParser = await import('koa-bodyparser');
-        const compress = await import('koa-compress');
+        const bodyParser = (await import('@koa/bodyparser')).default;
+        const compress = (await import('koa-compress') as any).default
+            ?? await import('koa-compress');
         const searchRouter  = await import('./search/router');
 
         app.use(compress());
-        app.use(json({pretty: false, param: 'pretty'}));
         app.use(bodyParser());
         app.use(searchRouter.default.routes());
     });
@@ -28,7 +27,6 @@ async function startWeb() {
 }
 
 async function setUpWebEnvironment(setUp: (app: Koa) => Promise<void>) {
-    const Koa = await import('koa');
     const app = new Koa();
 
     app.use(async (ctx, next) => {
@@ -62,9 +60,12 @@ async function setUpWebEnvironment(setUp: (app: Koa) => Promise<void>) {
     });
 
     if (config.env !== 'production') {
-        const morgan = await import('koa-morgan');
-        // @ts-ignore
-        app.use(morgan('short', {'stream': logger.stream}));
+        app.use(async (ctx, next) => {
+            const start = Date.now();
+            await next();
+            const ms = Date.now() - start;
+            logger.debug(`${ctx.status} ${ctx.method} ${ctx.originalUrl} - ${ms}ms`);
+        });
     }
 
     await setUp(app);
